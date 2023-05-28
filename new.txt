@@ -1,0 +1,30 @@
+[Unit]
+Description=gunicorn daemon
+After=network.target
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/ligaeuropa
+ExecStart=/home/ubuntu/venv/bin/gunicorn --access-logfile - --
+workers 3 --bind unix:/home/ubuntu/ligaeuropa/liga.sock liga.wsgi:application
+[Install]
+WantedBy=multi-user.target
+
+
+
+server {
+        listen 80;
+        server_name 3.144.180.138;
+        location = /favicon.ico {
+            access_log off;
+            log_not_found off;
+        }
+        location /static/ {
+            root /home/ubuntu/ligaeuropa;
+        }
+        location / {
+            include proxy_params;
+            proxy_pass http://unix:/home/ubuntu/ligaeuropa/ligaeuropa.sock;
+        }
+    }
+    
